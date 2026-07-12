@@ -1,0 +1,1982 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>定石帖 - 自分だけの定石ノート</title>
+<style>
+        @import url('https://fonts.googleapis.com/css2?family=Shippori+Mincho:wght@500;800&family=Zen+Kaku+Gothic+New:wght@400;500;700&family=JetBrains+Mono:wght@400;600&display=swap');
+html, body { margin: 0; padding: 0; min-height: 100%; }
+#root { min-height: 100vh; }
+
+        @import url('https://fonts.googleapis.com/css2?family=Shippori+Mincho:wght@500;800&family=Zen+Kaku+Gothic+New:wght@400;500;700&family=JetBrains+Mono:wght@400;600&display=swap');
+
+        :root {
+          --paper: #f3eedd;
+          --paper-deep: #ece4cc;
+          --wood: #c89b4a;
+          --ink: #211d17;
+          --ink-soft: #6b6153;
+          --seal: #a23324;
+          --seal-soft: rgba(162,51,36,0.10);
+          --border: #ddcfa9;
+          --card-bg: #fbf8ef;
+        }
+        * { box-sizing: border-box; }
+        .app {
+          font-family: 'Zen Kaku Gothic New', sans-serif;
+          background: var(--paper);
+          background-image:
+            radial-gradient(circle at 15% 8%, rgba(255,255,255,0.5), transparent 40%),
+            radial-gradient(circle at 90% 85%, rgba(0,0,0,0.03), transparent 40%);
+          color: var(--ink);
+          min-height: 100%;
+          padding: 28px 32px 60px;
+        }
+        .header {
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          margin-bottom: 24px;
+          flex-wrap: wrap;
+          gap: 12px;
+        }
+        .brand { display: flex; align-items: center; gap: 12px; }
+        .seal-icon {
+          width: 40px; height: 40px;
+          border-radius: 6px;
+          background: var(--seal);
+          color: #fdf7e8;
+          display: flex; align-items: center; justify-content: center;
+          font-family: 'Shippori Mincho', serif;
+          font-weight: 800;
+          font-size: 20px;
+          box-shadow: 0 2px 4px rgba(0,0,0,0.25);
+          flex-shrink: 0;
+        }
+        .brand h1 {
+          font-family: 'Shippori Mincho', serif;
+          font-weight: 800;
+          font-size: 26px;
+          margin: 0;
+          letter-spacing: 0.04em;
+        }
+        .brand p {
+          margin: 2px 0 0;
+          font-size: 12.5px;
+          color: var(--ink-soft);
+          letter-spacing: 0.03em;
+        }
+        .btn {
+          font-family: 'Zen Kaku Gothic New', sans-serif;
+          border: 1px solid var(--border);
+          background: var(--card-bg);
+          color: var(--ink);
+          border-radius: 7px;
+          padding: 9px 16px;
+          font-size: 14px;
+          cursor: pointer;
+          transition: all 0.15s ease;
+        }
+        .btn:hover { border-color: var(--wood); background: #fff; }
+        .btn:disabled { opacity: 0.4; cursor: not-allowed; }
+        .btn-primary {
+          background: var(--seal);
+          border-color: var(--seal);
+          color: #fdf7e8;
+          font-weight: 600;
+        }
+        .btn-primary:hover { background: #8a2a1e; }
+        .btn-ghost { background: transparent; }
+        .btn-sm { padding: 5px 10px; font-size: 12.5px; }
+
+        .datafile-bar { display: flex; flex-direction: column; gap: 6px; margin-bottom: 18px; }
+        .datafile-status, .datafile-alert, .datafile-manual {
+          display: flex; align-items: center; gap: 10px; flex-wrap: wrap;
+          font-size: 12.5px; color: var(--ink-soft);
+        }
+        .datafile-alert {
+          background: var(--seal-soft); border: 1px solid rgba(162,51,36,0.35);
+          border-radius: 8px; padding: 8px 12px; color: var(--seal); font-weight: 600;
+        }
+        .datafile-status strong { color: var(--ink); }
+        .datafile-manual { justify-content: flex-end; }
+        .datafile-error { font-size: 12px; color: var(--seal); }
+
+        .layout {
+          display: grid;
+          grid-template-columns: 300px 1fr;
+          gap: 22px;
+          align-items: start;
+        }
+        @media (max-width: 760px) {
+          .layout { grid-template-columns: 1fr; }
+        }
+
+        .sidebar {
+          background: var(--card-bg);
+          border: 1px solid var(--border);
+          border-radius: 12px;
+          padding: 16px;
+        }
+        .search-input {
+          width: 100%;
+          padding: 9px 12px;
+          border-radius: 7px;
+          border: 1px solid var(--border);
+          font-size: 14px;
+          margin-bottom: 12px;
+          background: #fff;
+          font-family: inherit;
+        }
+        .tag-chips {
+          display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 14px;
+        }
+        .chip {
+          font-size: 12px;
+          padding: 4px 10px;
+          border-radius: 999px;
+          border: 1px solid var(--border);
+          background: #fff;
+          color: var(--ink-soft);
+          cursor: pointer;
+        }
+        .chip.active { background: var(--seal-soft); border-color: var(--seal); color: var(--seal); font-weight: 600; }
+        .chip-add { background: var(--paper-deep); }
+
+        .kind-tabs { display: flex; gap: 6px; margin-bottom: 12px; }
+        .kind-tab {
+          flex: 1;
+          font-family: inherit;
+          font-size: 13px;
+          padding: 7px 8px;
+          border-radius: 7px;
+          border: 1px solid var(--border);
+          background: #fff;
+          color: var(--ink-soft);
+          cursor: pointer;
+        }
+        .kind-tab.active { background: var(--seal); border-color: var(--seal); color: #fdf7e8; font-weight: 600; }
+        .kind-badge {
+          display: inline-flex;
+          align-items: center;
+          justify-content: center;
+          width: 16px; height: 16px;
+          border-radius: 4px;
+          font-size: 10px;
+          font-weight: 700;
+          color: #fdf7e8;
+          margin-right: 5px;
+          flex-shrink: 0;
+        }
+        .kind-badge-joseki { background: var(--seal); }
+        .kind-badge-fuseki { background: #3a6b52; }
+        .kind-chip { font-weight: 600; }
+        .kind-chip-joseki { color: var(--seal); border-color: var(--seal); background: var(--seal-soft); }
+        .kind-chip-fuseki { color: #2b5240; border-color: #3a6b52; background: rgba(58,107,82,0.10); }
+
+        .joseki-list { display: flex; flex-direction: column; gap: 8px; max-height: 64vh; overflow-y: auto; }
+        .joseki-card {
+          display: flex; align-items: center; gap: 10px;
+          padding: 8px; border-radius: 9px;
+          border: 1px solid transparent;
+          cursor: pointer;
+          background: #fff;
+        }
+        .joseki-card:hover { border-color: var(--border); }
+        .joseki-card.active { border-color: var(--seal); background: var(--seal-soft); }
+        .card-thumb { width: 64px; height: 64px; flex-shrink: 0; }
+        .card-info { min-width: 0; }
+        .card-name {
+          font-size: 13.5px; font-weight: 600;
+          white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+        }
+        .card-tags { font-size: 11px; color: var(--ink-soft); margin-top: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .empty-list { font-size: 13px; color: var(--ink-soft); padding: 20px 6px; text-align: center; }
+
+        .main {
+          background: var(--card-bg);
+          border: 1px solid var(--border);
+          border-radius: 12px;
+          padding: 26px;
+          min-height: 480px;
+        }
+        .empty-state {
+          display: flex; flex-direction: column; align-items: center; justify-content: center;
+          text-align: center; height: 440px; color: var(--ink-soft);
+        }
+        .empty-state h3 { font-family: 'Shippori Mincho', serif; font-size: 19px; color: var(--ink); margin-bottom: 6px; }
+
+        .detail-header { display: flex; justify-content: space-between; align-items: flex-start; gap: 12px; margin-bottom: 6px; flex-wrap: wrap; }
+        .detail-title { font-family: 'Shippori Mincho', serif; font-size: 22px; font-weight: 800; margin: 0; }
+        .detail-tags { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 8px; }
+        .detail-actions { display: flex; gap: 8px; }
+        .icon-btn {
+          border: none; background: transparent; font-size: 20px; cursor: pointer; color: var(--ink-soft);
+          line-height: 1; padding: 4px 8px; border-radius: 6px;
+        }
+        .icon-btn:hover { background: var(--paper-deep); color: var(--ink); }
+
+        .board-wrap { display: flex; justify-content: center; margin: 18px 0 8px; }
+        .playback-controls {
+          display: flex; align-items: center; justify-content: center; gap: 10px;
+          font-family: 'JetBrains Mono', monospace; font-size: 13px; color: var(--ink-soft);
+          margin-bottom: 18px;
+        }
+        .caption { text-align: center; font-size: 11.5px; color: var(--ink-soft); margin-top: -6px; margin-bottom: 14px; }
+
+        .branch-panel {
+          background: var(--seal-soft);
+          border: 1px solid rgba(162,51,36,0.35);
+          border-radius: 10px;
+          padding: 12px 14px;
+          margin-bottom: 18px;
+        }
+        .branch-title { font-size: 12.5px; font-weight: 600; color: var(--seal); margin-bottom: 8px; }
+        .branch-list { display: flex; flex-wrap: wrap; gap: 8px; }
+        .branch-card {
+          font-family: inherit;
+          text-align: left;
+          border: 1px solid var(--border);
+          background: #fff;
+          border-radius: 8px;
+          padding: 7px 11px;
+          cursor: pointer;
+          min-width: 140px;
+        }
+        .branch-card:hover { border-color: var(--seal); }
+        .branch-card.active { border-color: var(--seal); background: #fff; cursor: default; box-shadow: inset 0 0 0 1px var(--seal); }
+        .branch-name { font-size: 13px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 200px; }
+        .branch-next { font-size: 11.5px; color: var(--ink-soft); font-family: 'JetBrains Mono', monospace; margin-top: 2px; }
+
+        .notes-section { border-top: 1px dashed var(--border); padding-top: 14px; }
+        .notes-label { font-size: 12px; color: var(--ink-soft); margin-bottom: 6px; letter-spacing: 0.05em; }
+        .notes-text { font-size: 14px; line-height: 1.8; white-space: pre-wrap; }
+
+        .modal-overlay {
+          position: fixed; inset: 0; background: rgba(33,29,23,0.55);
+          display: flex; align-items: center; justify-content: center; z-index: 50; padding: 20px;
+        }
+        .modal {
+          background: var(--paper);
+          border-radius: 14px;
+          max-width: 1056px; width: 100%;
+          max-height: 97vh; overflow-y: auto;
+          box-shadow: 0 20px 50px rgba(0,0,0,0.35);
+        }
+        .modal-header { display: flex; align-items: center; gap: 11px; padding: 20px 24px; border-bottom: 1px solid var(--border); }
+        .modal-header h2 { font-family: 'Shippori Mincho', serif; font-size: 20px; margin: 0; flex: 1; }
+        .modal-body { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; padding: 24px; }
+        @media (max-width: 640px) { .modal-body { grid-template-columns: 1fr; } }
+        .modal-board-col { display: flex; flex-direction: column; align-items: center; }
+        .board-edit-hint { font-size: 11.5px; color: var(--ink-soft); text-align: center; margin-top: 8px; }
+        .turn-toggle { display: flex; align-items: center; gap: 6px; margin-top: 12px; flex-wrap: wrap; justify-content: center; font-size: 13px; }
+        .turn-btn { border: 1px solid var(--border); background: #fff; border-radius: 7px; padding: 6px 10px; font-size: 13px; cursor: pointer; }
+        .turn-btn.active { background: var(--seal); color: #fdf7e8; border-color: var(--seal); }
+
+        .form-label { display: block; font-size: 12.5px; color: var(--ink-soft); margin: 12px 0 5px; letter-spacing: 0.03em; }
+        .form-label:first-child { margin-top: 0; }
+        .req { color: var(--seal); margin-left: 2px; }
+        .form-input, .form-textarea {
+          width: 100%; border: 1px solid var(--border); border-radius: 7px; padding: 10px 12px;
+          font-family: inherit; font-size: 15px; background: #fff; resize: vertical;
+        }
+        .quick-tags { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px; }
+        .modal-actions { display: flex; justify-content: flex-end; gap: 10px; margin-top: 20px; }
+
+        .footer { text-align: center; margin-top: 30px; font-size: 12px; color: var(--ink-soft); }
+        .footer button { background: none; border: none; color: var(--ink-soft); text-decoration: underline; cursor: pointer; font-size: 12px; }
+      
+</style>
+</head>
+<body>
+<div id="root"></div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.3.1/umd/react.production.min.js" crossorigin></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.3.1/umd/react-dom.production.min.js" crossorigin></script>
+
+<script>
+const { useState, useEffect, useMemo, useRef } = React;
+
+/* ============================== 定数 ============================== */
+
+const N = 19; // 19路盤
+const COLS = ["A", "B", "C", "D", "E", "F", "G", "H", "J", "K", "L", "M", "N", "O", "P", "Q", "R", "S", "T"];
+const HOSHI = [[4, 4], [4, 10], [4, 16], [10, 4], [10, 10], [10, 16], [16, 4], [16, 10], [16, 16]];
+const QUICK_TAGS_JOSEKI = ["星", "小目", "三々", "目外し", "高目", "大高目"];
+const QUICK_TAGS_FUSEKI = ["二連星", "三連星", "中国流", "小林流", "秀策流", "対角線"];
+const KIND_LABELS = { joseki: "定石", fuseki: "布石" };
+const STORAGE_KEY = "joseki-collection";
+const genId = () => "j" + Date.now().toString(36) + Math.random().toString(36).slice(2, 7);
+// 保存済みデータに種別（kind）が無い場合は「定石」として扱う（後方互換のため）
+const normalizeKind = k => k === "fuseki" ? "fuseki" : "joseki";
+const normalizeEntries = arr => (Array.isArray(arr) ? arr : []).map(j => ({ ...j, kind: normalizeKind(j.kind) }));
+
+/* ============================== データファイル連携ヘルパー ============================== */
+// File System Access API で選んだファイルへの参照（ハンドル）を
+// IndexedDB に保存し、次回起動時も同じファイルと連携できるようにする。
+
+const DB_NAME = "joseki-fs-db";
+const DB_STORE = "handles";
+const HANDLE_KEY = "dataFileHandle";
+function idbOpen() {
+  return new Promise((resolve, reject) => {
+    const req = indexedDB.open(DB_NAME, 1);
+    req.onupgradeneeded = () => req.result.createObjectStore(DB_STORE);
+    req.onsuccess = () => resolve(req.result);
+    req.onerror = () => reject(req.error);
+  });
+}
+async function idbGetHandle() {
+  const db = await idbOpen();
+  return new Promise((resolve, reject) => {
+    const tx = db.transaction(DB_STORE, "readonly");
+    const req = tx.objectStore(DB_STORE).get(HANDLE_KEY);
+    req.onsuccess = () => resolve(req.result || null);
+    req.onerror = () => reject(req.error);
+  });
+}
+async function idbSetHandle(handle) {
+  const db = await idbOpen();
+  return new Promise((resolve, reject) => {
+    const tx = db.transaction(DB_STORE, "readwrite");
+    tx.objectStore(DB_STORE).put(handle, HANDLE_KEY);
+    tx.oncomplete = () => resolve();
+    tx.onerror = () => reject(tx.error);
+  });
+}
+async function idbClearHandle() {
+  const db = await idbOpen();
+  return new Promise((resolve, reject) => {
+    const tx = db.transaction(DB_STORE, "readwrite");
+    tx.objectStore(DB_STORE).delete(HANDLE_KEY);
+    tx.oncomplete = () => resolve();
+    tx.onerror = () => reject(tx.error);
+  });
+}
+async function readJosekiFile(handle) {
+  const file = await handle.getFile();
+  const text = await file.text();
+  const arr = JSON.parse(text);
+  if (!Array.isArray(arr)) throw new Error("invalid format");
+  return normalizeEntries(arr);
+}
+async function writeJosekiFile(handle, arr) {
+  const writable = await handle.createWritable();
+  await writable.write(JSON.stringify(arr, null, 2));
+  await writable.close();
+}
+
+/* ============================== SGF読み込みヘルパー ============================== */
+// SGF（棋譜ファイル）をノード木にパースし、変化（分岐）をたどりながら
+// 好きな局面までの手順を「定石」として取り込めるようにする。
+
+// SGF座標（例："pd"）を盤面座標 {col, row} に変換する。
+// SGFは列がa〜s（左→右＝1〜19）、行がa〜s（上→下）。
+// このアプリの row は下から数える（星の定義などと合わせるため）ので反転する。
+function sgfCoordToPoint(v) {
+  if (!v || v.length < 2) return null; // パス等
+  const c = v.charCodeAt(0) - 96; // a=1
+  const r = v.charCodeAt(1) - 96; // a=1（盤の一番上）
+  if (c < 1 || c > 19 || r < 1 || r > 19) return null; // "tt" 等の旧式パス
+  return {
+    col: c,
+    row: 20 - r
+  };
+}
+
+// SGFテキストをパースして、最初の対局木のルートノードを返す。
+// 各ノードは { props, children, parent } を持つ。
+function parseSgf(text) {
+  let i = 0;
+  const len = text.length;
+  const skipWs = () => {
+    while (i < len && /\s/.test(text[i])) i++;
+  };
+  const parseValue = () => {
+    i++; // "[" を読み飛ばす
+    let out = "";
+    while (i < len) {
+      const ch = text[i];
+      if (ch === "\\") {
+        const next = text[i + 1];
+        if (next === "\n") {
+          i += 2; // ソフト改行（行継続）は取り除く
+          continue;
+        }
+        if (next === "\r") {
+          i += 2;
+          if (text[i] === "\n") i++;
+          continue;
+        }
+        if (next !== undefined) {
+          out += next;
+          i += 2;
+          continue;
+        }
+        i++;
+        continue;
+      }
+      if (ch === "]") {
+        i++;
+        break;
+      }
+      out += ch;
+      i++;
+    }
+    return out;
+  };
+  const parseNode = () => {
+    i++; // ";" を読み飛ばす
+    const props = {};
+    skipWs();
+    while (i < len && /[A-Za-z]/.test(text[i])) {
+      let id = "";
+      while (i < len && /[A-Za-z]/.test(text[i])) {
+        id += text[i];
+        i++;
+      }
+      skipWs();
+      const values = [];
+      while (i < len && text[i] === "[") {
+        values.push(parseValue());
+        skipWs();
+      }
+      props[id] = values;
+      skipWs();
+    }
+    return props;
+  };
+  const parseSequence = () => {
+    const nodes = [];
+    skipWs();
+    while (i < len && text[i] === ";") {
+      nodes.push(parseNode());
+      skipWs();
+    }
+    return nodes;
+  };
+  const parseGameTree = () => {
+    skipWs();
+    if (text[i] !== "(") return null;
+    i++; // "(" を読み飛ばす
+    const sequence = parseSequence();
+    const subtrees = [];
+    skipWs();
+    while (i < len && text[i] === "(") {
+      subtrees.push(parseGameTree());
+      skipWs();
+    }
+    skipWs();
+    if (text[i] === ")") i++;
+    return {
+      sequence,
+      subtrees
+    };
+  };
+  skipWs();
+  const gt = parseGameTree();
+  if (!gt || gt.sequence.length === 0) {
+    throw new Error("SGFの解析に失敗しました（対局木が見つかりません）");
+  }
+  const convert = (tree, parentNode) => {
+    let prev = parentNode;
+    let first = null;
+    for (const props of tree.sequence) {
+      const node = {
+        props,
+        children: [],
+        parent: prev
+      };
+      if (prev) prev.children.push(node);
+      if (!first) first = node;
+      prev = node;
+    }
+    for (const sub of tree.subtrees) {
+      convert(sub, prev);
+    }
+    return first;
+  };
+  const root = convert(gt, null);
+  if (!root) throw new Error("SGFに手が含まれていません");
+  return root;
+}
+
+// ノードが着手（B or W）を持っていれば {col, row, color} を返す
+function sgfNodeMove(node) {
+  if (!node || !node.props) return null;
+  if (node.props.B) {
+    const p = sgfCoordToPoint(node.props.B[0]);
+    return p ? {
+      col: p.col,
+      row: p.row,
+      color: "b"
+    } : null;
+  }
+  if (node.props.W) {
+    const p = sgfCoordToPoint(node.props.W[0]);
+    return p ? {
+      col: p.col,
+      row: p.row,
+      color: "w"
+    } : null;
+  }
+  return null;
+}
+
+// ルートから指定ノードまでの経路（ノード配列）を返す
+function sgfPathToNode(node) {
+  const arr = [];
+  let n = node;
+  while (n) {
+    arr.push(n);
+    n = n.parent;
+  }
+  return arr.reverse();
+}
+
+// ノードのコメント（C[]）を1つの文字列で返す
+function sgfNodeComment(node) {
+  if (!node || !node.props || !node.props.C) return "";
+  return node.props.C.join("\n");
+}
+
+/* ============================== 碁盤コンポーネント ============================== */
+
+function GoBoard({
+  stones,
+  size = 400,
+  interactive = false,
+  onIntersect,
+  showLabels = false,
+  idPrefix = "b"
+}) {
+  // 木目部分の外枠から罫線までの余白（隙間）。実物の碁盤に近い比率まで縮小。
+  const pad = size * 0.052;
+  const cell = (size - pad * 2) / (N - 1);
+  // 座標ラベルは木目部分の「外側」に描画する。そのための余白を別途確保し、
+  // 盤面（罫線・石）の位置は木目部分の左上を原点として計算する。
+  const labelGapX = showLabels ? size * 0.052 : 0; // 左側：段（行）番号用
+  const labelGapY = showLabels ? size * 0.058 : 0; // 下側：筋（列）アルファベット用
+  const boardOriginX = labelGapX;
+  const toXY = (col, row) => ({
+    x: boardOriginX + pad + (col - 1) * cell,
+    y: pad + (N - row) * cell
+  });
+  const stoneMap = new Map();
+  stones.forEach(s => stoneMap.set(`${s.col}-${s.row}`, s));
+  const lastStone = stones[stones.length - 1];
+  const gradB = `${idPrefix}-gradB`;
+  const gradW = `${idPrefix}-gradW`;
+  const gradWood = `${idPrefix}-gradWood`;
+  const points = [];
+  for (let c = 1; c <= N; c++) {
+    for (let r = 1; r <= N; r++) points.push([c, r]);
+  }
+  return /*#__PURE__*/React.createElement("svg", {
+    viewBox: `0 0 ${size + labelGapX} ${size + labelGapY}`,
+    width: "100%",
+    style: {
+      display: "block",
+      maxWidth: size + labelGapX
+    }
+  }, /*#__PURE__*/React.createElement("defs", null, /*#__PURE__*/React.createElement("radialGradient", {
+    id: gradWood,
+    cx: "35%",
+    cy: "30%",
+    r: "80%"
+  }, /*#__PURE__*/React.createElement("stop", {
+    offset: "0%",
+    stopColor: "#e9c67e"
+  }), /*#__PURE__*/React.createElement("stop", {
+    offset: "55%",
+    stopColor: "#cf9f4f"
+  }), /*#__PURE__*/React.createElement("stop", {
+    offset: "100%",
+    stopColor: "#a97a34"
+  })), /*#__PURE__*/React.createElement("radialGradient", {
+    id: gradB,
+    cx: "35%",
+    cy: "30%",
+    r: "70%"
+  }, /*#__PURE__*/React.createElement("stop", {
+    offset: "0%",
+    stopColor: "#4c483f"
+  }), /*#__PURE__*/React.createElement("stop", {
+    offset: "45%",
+    stopColor: "#28251f"
+  }), /*#__PURE__*/React.createElement("stop", {
+    offset: "100%",
+    stopColor: "#100e0b"
+  })), /*#__PURE__*/React.createElement("radialGradient", {
+    id: gradW,
+    cx: "35%",
+    cy: "30%",
+    r: "70%"
+  }, /*#__PURE__*/React.createElement("stop", {
+    offset: "0%",
+    stopColor: "#ffffff"
+  }), /*#__PURE__*/React.createElement("stop", {
+    offset: "70%",
+    stopColor: "#f3efe1"
+  }), /*#__PURE__*/React.createElement("stop", {
+    offset: "100%",
+    stopColor: "#d9d2bd"
+  }))), /*#__PURE__*/React.createElement("rect", {
+    x: boardOriginX,
+    y: 0,
+    width: size,
+    height: size,
+    rx: size * 0.03,
+    fill: `url(#${gradWood})`,
+    stroke: "#7a5a26",
+    strokeWidth: size * 0.008
+  }), Array.from({
+    length: N
+  }, (_, i) => i + 1).map(i => {
+    const p1 = toXY(i, 1);
+    const p2 = toXY(i, N);
+    const q1 = toXY(1, i);
+    const q2 = toXY(N, i);
+    return /*#__PURE__*/React.createElement("g", {
+      key: "line" + i,
+      stroke: "#5b431c",
+      strokeWidth: size * 0.0028,
+      opacity: 0.75
+    }, /*#__PURE__*/React.createElement("line", {
+      x1: p1.x,
+      y1: p1.y,
+      x2: p2.x,
+      y2: p2.y
+    }), /*#__PURE__*/React.createElement("line", {
+      x1: q1.x,
+      y1: q1.y,
+      x2: q2.x,
+      y2: q2.y
+    }));
+  }), HOSHI.map(([hc, hr]) => /*#__PURE__*/React.createElement("circle", {
+    key: `hoshi-${hc}-${hr}`,
+    cx: toXY(hc, hr).x,
+    cy: toXY(hc, hr).y,
+    r: size * 0.006,
+    fill: "#4a3315"
+  })), showLabels && COLS.map((label, idx) => /*#__PURE__*/React.createElement("text", {
+    key: "col" + idx,
+    x: toXY(idx + 1, 1).x,
+    y: size + labelGapY * 0.62,
+    fontSize: size * 0.032,
+    fontFamily: "'JetBrains Mono', monospace",
+    fill: "#6b5a3a",
+    textAnchor: "middle"
+  }, label)), showLabels && Array.from({
+    length: N
+  }, (_, i) => N - i).map(row => /*#__PURE__*/React.createElement("text", {
+    key: "row" + row,
+    x: labelGapX * 0.45,
+    y: toXY(1, row).y + size * 0.011,
+    fontSize: size * 0.032,
+    fontFamily: "'JetBrains Mono', monospace",
+    fill: "#6b5a3a",
+    textAnchor: "middle"
+  }, row)), stones.map((s, i) => {
+    const {
+      x,
+      y
+    } = toXY(s.col, s.row);
+    const isLast = lastStone && s === lastStone;
+    return /*#__PURE__*/React.createElement("g", {
+      key: "stone" + i
+    }, /*#__PURE__*/React.createElement("circle", {
+      cx: x,
+      cy: y + size * 0.006,
+      r: cell * 0.46,
+      fill: "#000",
+      opacity: 0.18
+    }), /*#__PURE__*/React.createElement("circle", {
+      cx: x,
+      cy: y,
+      r: cell * 0.46,
+      fill: `url(#${s.color === "b" ? gradB : gradW})`,
+      stroke: s.color === "b" ? "#000" : "#b8ac8e",
+      strokeWidth: size * 0.0015
+    }), isLast && /*#__PURE__*/React.createElement("circle", {
+      cx: x,
+      cy: y,
+      r: cell * 0.18,
+      fill: "none",
+      stroke: "#a23324",
+      strokeWidth: size * 0.004
+    }), /*#__PURE__*/React.createElement("text", {
+      x: x,
+      y: y + cell * 0.14,
+      fontSize: cell * 0.42,
+      fontFamily: "'JetBrains Mono', monospace",
+      fontWeight: 600,
+      textAnchor: "middle",
+      fill: s.color === "b" ? "#f2ede0" : "#2a2620"
+    }, i + 1));
+  }), interactive && points.map(([c, r]) => {
+    const {
+      x,
+      y
+    } = toXY(c, r);
+    return /*#__PURE__*/React.createElement("circle", {
+      key: `hit-${c}-${r}`,
+      cx: x,
+      cy: y,
+      r: cell * 0.46,
+      fill: "transparent",
+      style: {
+        cursor: "pointer"
+      },
+      onClick: () => onIntersect(c, r)
+    });
+  }));
+}
+
+/* ============================== 登録・編集フォーム ============================== */
+
+function JosekiForm({
+  initial,
+  onSave,
+  onCancel,
+  defaultKind
+}) {
+  const [name, setName] = useState(initial?.name || "");
+  const [tagsInput, setTagsInput] = useState((initial?.tags || []).join("、"));
+  const [notes, setNotes] = useState(initial?.notes || "");
+  const [moves, setMoves] = useState(initial?.moves || []);
+  const [manualNext, setManualNext] = useState(null);
+  const [kind, setKind] = useState(normalizeKind(initial?.kind || defaultKind));
+  const quickTags = kind === "fuseki" ? QUICK_TAGS_FUSEKI : QUICK_TAGS_JOSEKI;
+  const autoNext = moves.length === 0 ? "b" : moves[moves.length - 1].color === "b" ? "w" : "b";
+  const nextColor = manualNext || autoNext;
+  const handleIntersect = (col, row) => {
+    const last = moves[moves.length - 1];
+    if (last && last.col === col && last.row === row) {
+      setMoves(moves.slice(0, -1));
+      return;
+    }
+    if (moves.some(m => m.col === col && m.row === row)) return;
+    setMoves([...moves, {
+      col,
+      row,
+      color: nextColor
+    }]);
+    setManualNext(null);
+  };
+  const addQuickTag = t => {
+    const parts = tagsInput.split(/[、,]/).map(s => s.trim()).filter(Boolean);
+    if (!parts.includes(t)) setTagsInput([...parts, t].join("、"));
+  };
+  const canSave = name.trim().length > 0;
+  const handleSave = () => {
+    if (!canSave) return;
+    const tags = tagsInput.split(/[、,]/).map(s => s.trim()).filter(Boolean);
+    onSave({
+      id: initial?.id || genId(),
+      name: name.trim(),
+      kind,
+      tags,
+      moves,
+      notes: notes.trim(),
+      createdAt: initial?.createdAt || Date.now()
+    });
+  };
+  return /*#__PURE__*/React.createElement("div", {
+    className: "modal-overlay",
+    onClick: onCancel
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "modal",
+    onClick: e => e.stopPropagation()
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "modal-header"
+  }, /*#__PURE__*/React.createElement("span", {
+    className: "seal-icon"
+  }, "石"), /*#__PURE__*/React.createElement("h2", null, initial ? `${KIND_LABELS[kind]}を編集` : `新しい${KIND_LABELS[kind]}を登録`), /*#__PURE__*/React.createElement("button", {
+    className: "icon-btn",
+    onClick: onCancel,
+    "aria-label": "閉じる"
+  }, "×")), /*#__PURE__*/React.createElement("div", {
+    className: "modal-body"
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "modal-board-col"
+  }, /*#__PURE__*/React.createElement(GoBoard, {
+    stones: moves,
+    size: 484,
+    interactive: true,
+    showLabels: true,
+    onIntersect: handleIntersect,
+    idPrefix: "edit"
+  }), /*#__PURE__*/React.createElement("div", {
+    className: "board-edit-hint"
+  }, "交点をクリックして着手。最後の石をもう一度クリックで取り消し。"), /*#__PURE__*/React.createElement("div", {
+    className: "turn-toggle"
+  }, /*#__PURE__*/React.createElement("span", null, "次の一手："), /*#__PURE__*/React.createElement("button", {
+    className: `turn-btn ${nextColor === "b" ? "active" : ""}`,
+    onClick: () => setManualNext("b")
+  }, "● 黒"), /*#__PURE__*/React.createElement("button", {
+    className: `turn-btn ${nextColor === "w" ? "active" : ""}`,
+    onClick: () => setManualNext("w")
+  }, "○ 白"), /*#__PURE__*/React.createElement("button", {
+    className: "btn btn-ghost",
+    onClick: () => setMoves(moves.slice(0, -1)),
+    disabled: moves.length === 0
+  }, "一手戻す"), /*#__PURE__*/React.createElement("button", {
+    className: "btn btn-ghost",
+    onClick: () => setMoves([]),
+    disabled: moves.length === 0
+  }, "全て消去"))), /*#__PURE__*/React.createElement("div", {
+    className: "modal-form-col"
+  }, /*#__PURE__*/React.createElement("label", {
+    className: "form-label"
+  }, "種別", /*#__PURE__*/React.createElement("span", {
+    className: "req"
+  }, "*")), /*#__PURE__*/React.createElement("div", {
+    className: "turn-toggle",
+    style: {
+      justifyContent: "flex-start",
+      marginTop: 0
+    }
+  }, /*#__PURE__*/React.createElement("button", {
+    type: "button",
+    className: `turn-btn ${kind === "joseki" ? "active" : ""}`,
+    onClick: () => setKind("joseki")
+  }, "定石（部分手順）"), /*#__PURE__*/React.createElement("button", {
+    type: "button",
+    className: `turn-btn ${kind === "fuseki" ? "active" : ""}`,
+    onClick: () => setKind("fuseki")
+  }, "布石（全局的な構想）")), /*#__PURE__*/React.createElement("label", {
+    className: "form-label"
+  }, "名称", /*#__PURE__*/React.createElement("span", {
+    className: "req"
+  }, "*")), /*#__PURE__*/React.createElement("input", {
+    className: "form-input",
+    value: name,
+    onChange: e => setName(e.target.value),
+    placeholder: kind === "fuseki" ? "例：二連星からの中国流布石" : "例：星に小ガカリ 一間受け定石"
+  }), /*#__PURE__*/React.createElement("label", {
+    className: "form-label"
+  }, "タグ"), /*#__PURE__*/React.createElement("input", {
+    className: "form-input",
+    value: tagsInput,
+    onChange: e => setTagsInput(e.target.value),
+    placeholder: "例：星、実戦型、シンプル（読点区切り）"
+  }), /*#__PURE__*/React.createElement("div", {
+    className: "quick-tags"
+  }, quickTags.map(t => /*#__PURE__*/React.createElement("button", {
+    key: t,
+    className: "chip chip-add",
+    onClick: () => addQuickTag(t)
+  }, "+ ", t))), /*#__PURE__*/React.createElement("label", {
+    className: "form-label"
+  }, "メモ"), /*#__PURE__*/React.createElement("textarea", {
+    className: "form-textarea",
+    value: notes,
+    onChange: e => setNotes(e.target.value),
+    placeholder: "成立条件、変化、出典、狙いなど自由に記入",
+    rows: 7
+  }), /*#__PURE__*/React.createElement("div", {
+    className: "modal-actions"
+  }, /*#__PURE__*/React.createElement("button", {
+    className: "btn btn-ghost",
+    onClick: onCancel
+  }, "キャンセル"), /*#__PURE__*/React.createElement("button", {
+    className: "btn btn-primary",
+    onClick: handleSave,
+    disabled: !canSave
+  }, "保存する"))))));
+}
+
+/* ============================== SGF読み込みモーダル ============================== */
+
+// SGFのゲーム情報（対局者・日付・結果など）を人が読みやすい形にまとめる
+function sgfGameInfoLines(rootProps) {
+  const get = key => rootProps[key] ? rootProps[key][0] : "";
+  const lines = [];
+  const pb = get("PB"),
+    pw = get("PW"),
+    br = get("BR"),
+    wr = get("WR");
+  if (pb || pw) {
+    lines.push(`● ${pb || "(黒)"}${br ? `（${br}）` : ""}　vs　○ ${pw || "(白)"}${wr ? `（${wr}）` : ""}`);
+  }
+  const dt = get("DT"),
+    re = get("RE"),
+    km = get("KM"),
+    ev = get("EV") || get("GN");
+  const meta = [];
+  if (ev) meta.push(ev);
+  if (dt) meta.push(dt);
+  if (km) meta.push(`コミ${km}`);
+  if (re) meta.push(`結果：${re}`);
+  if (meta.length) lines.push(meta.join("　／　"));
+  return lines;
+}
+function sgfSuggestName(rootProps, fileName) {
+  const get = key => rootProps[key] ? rootProps[key][0] : "";
+  const gn = get("GN");
+  if (gn) return gn;
+  const pb = get("PB"),
+    pw = get("PW");
+  if (pb && pw) return `${pb} vs ${pw}`;
+  if (fileName) return fileName.replace(/\.sgf$/i, "");
+  return "SGFから読み込んだ定石";
+}
+function SgfImportModal({
+  sgfText,
+  fileName,
+  onCancel,
+  onImport
+}) {
+  const parsed = useMemo(() => {
+    try {
+      const root = parseSgf(sgfText);
+      return {
+        root,
+        error: null
+      };
+    } catch (e) {
+      return {
+        root: null,
+        error: e.message || "SGFの解析に失敗しました"
+      };
+    }
+  }, [sgfText]);
+  const [current, setCurrent] = useState(parsed.root);
+  const [jumpTo, setJumpTo] = useState("100");
+  const [kind, setKind] = useState("joseki");
+
+  // 盤面上でマウスホイールを回して手順を送り／戻しできるようにする
+  // （前進はボタンの「主線を最後まで進める」と同じく、常に最初の変化をたどる。
+  //   分岐を選びたい場合はこれまで通り変化カードをクリックする）
+  const sgfBoardRef = useRef(null);
+  useEffect(() => {
+    const el = sgfBoardRef.current;
+    if (!el) return;
+    const onWheel = e => {
+      e.preventDefault();
+      if (e.deltaY > 0) {
+        if (current.children && current.children.length > 0) {
+          setCurrent(current.children[0]);
+        }
+      } else if (current.parent) {
+        setCurrent(current.parent);
+      }
+    };
+    el.addEventListener("wheel", onWheel, {
+      passive: false
+    });
+    return () => el.removeEventListener("wheel", onWheel);
+  }, [current]);
+  if (parsed.error) {
+    return /*#__PURE__*/React.createElement("div", {
+      className: "modal-overlay",
+      onClick: onCancel
+    }, /*#__PURE__*/React.createElement("div", {
+      className: "modal",
+      onClick: e => e.stopPropagation()
+    }, /*#__PURE__*/React.createElement("div", {
+      className: "modal-header"
+    }, /*#__PURE__*/React.createElement("span", {
+      className: "seal-icon"
+    }, "碁"), /*#__PURE__*/React.createElement("h2", null, "SGFから読み込む"), /*#__PURE__*/React.createElement("button", {
+      className: "icon-btn",
+      onClick: onCancel,
+      "aria-label": "閉じる"
+    }, "×")), /*#__PURE__*/React.createElement("div", {
+      className: "modal-body",
+      style: {
+        gridTemplateColumns: "1fr"
+      }
+    }, /*#__PURE__*/React.createElement("div", {
+      className: "sgf-error"
+    }, "このファイルを読み込めませんでした：", parsed.error))));
+  }
+  const root = parsed.root;
+  const pathNodes = sgfPathToNode(current);
+  const pathMoves = pathNodes.map(sgfNodeMove).filter(Boolean);
+  const infoLines = sgfGameInfoLines(root.props);
+  const comment = sgfNodeComment(current);
+  const atRoot = current === root;
+  const children = current.children || [];
+  const goToRoot = () => setCurrent(root);
+  const goToParent = () => {
+    if (current.parent) setCurrent(current.parent);
+  };
+  const goToChild = child => setCurrent(child);
+  const goToMainlineEnd = () => {
+    let n = root;
+    while (n.children && n.children.length > 0) n = n.children[0];
+    setCurrent(n);
+  };
+  // 主線（各分岐の最初の変化）をたどり、指定の手数まで進める
+  const goToMoveNumber = target => {
+    if (!Number.isFinite(target) || target < 0) {
+      window.alert("手数は0以上の数字で指定してください");
+      return;
+    }
+    let n = root;
+    let count = 0;
+    while (count < target && n.children && n.children.length > 0) {
+      n = n.children[0];
+      count++;
+    }
+    setCurrent(n);
+  };
+  const branchLabel = node => {
+    const mv = sgfNodeMove(node);
+    if (!mv) return "（着手なし）";
+    return `${mv.color === "b" ? "●黒" : "○白"} ${COLS[mv.col - 1]}${mv.row}`;
+  };
+  const handleImportHere = () => {
+    if (pathMoves.length === 0) {
+      window.alert("まだ手が1つも選ばれていません。盤面を進めてから読み込んでください。");
+      return;
+    }
+    const infoText = infoLines.join("\n");
+    const notesParts = [];
+    if (infoText) notesParts.push(infoText);
+    notesParts.push(`（SGFファイル「${fileName}」より読み込み）`);
+    onImport({
+      name: sgfSuggestName(root.props, fileName),
+      kind,
+      tags: [],
+      moves: pathMoves,
+      notes: notesParts.join("\n\n")
+    });
+  };
+  return /*#__PURE__*/React.createElement("div", {
+    className: "modal-overlay",
+    onClick: onCancel
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "modal",
+    onClick: e => e.stopPropagation()
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "modal-header"
+  }, /*#__PURE__*/React.createElement("span", {
+    className: "seal-icon"
+  }, "碁"), /*#__PURE__*/React.createElement("h2", null, "SGFから読み込む"), /*#__PURE__*/React.createElement("button", {
+    className: "icon-btn",
+    onClick: onCancel,
+    "aria-label": "閉じる"
+  }, "×")), /*#__PURE__*/React.createElement("div", {
+    className: "modal-body"
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "modal-board-col"
+  }, /*#__PURE__*/React.createElement("div", {
+    ref: sgfBoardRef
+  }, /*#__PURE__*/React.createElement(GoBoard, {
+    stones: pathMoves,
+    size: 484,
+    showLabels: true,
+    idPrefix: "sgf"
+  })), /*#__PURE__*/React.createElement("div", {
+    className: "board-edit-hint"
+  }, "盤面上でマウスホイールでも操作できます（戻す／進める。進める側は主線をたどります）"), /*#__PURE__*/React.createElement("div", {
+    className: "playback-controls"
+  }, /*#__PURE__*/React.createElement("button", {
+    className: "btn btn-ghost",
+    onClick: goToRoot,
+    disabled: atRoot
+  }, "｜◀"), /*#__PURE__*/React.createElement("button", {
+    className: "btn btn-ghost",
+    onClick: goToParent,
+    disabled: atRoot
+  }, "◀ 一手戻す"), /*#__PURE__*/React.createElement("span", null, pathMoves.length, "手目"), /*#__PURE__*/React.createElement("button", {
+    className: "btn btn-ghost",
+    onClick: () => children.length === 1 && goToChild(children[0]),
+    disabled: children.length !== 1
+  }, "次へ ▶")), /*#__PURE__*/React.createElement("div", {
+    className: "sgf-quickrow"
+  }, /*#__PURE__*/React.createElement("button", {
+    className: "btn btn-ghost btn-sm",
+    onClick: goToMainlineEnd
+  }, "主線を最後まで進める"), /*#__PURE__*/React.createElement("span", {
+    className: "sgf-jump"
+  }, /*#__PURE__*/React.createElement("input", {
+    type: "number",
+    min: "0",
+    className: "sgf-jump-input",
+    value: jumpTo,
+    onChange: e => setJumpTo(e.target.value)
+  }), /*#__PURE__*/React.createElement("button", {
+    className: "btn btn-ghost btn-sm",
+    onClick: () => goToMoveNumber(parseInt(jumpTo, 10))
+  }, "手目まで進める"))), children.length > 1 && /*#__PURE__*/React.createElement("div", {
+    className: "branch-panel",
+    style: {
+      width: "100%",
+      marginTop: 12
+    }
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "branch-title"
+  }, "🔀 ここから", children.length, "通りの変化があります"), /*#__PURE__*/React.createElement("div", {
+    className: "branch-list"
+  }, children.map((c, idx) => /*#__PURE__*/React.createElement("button", {
+    key: idx,
+    className: "branch-card",
+    onClick: () => goToChild(c)
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "branch-name"
+  }, branchLabel(c)), sgfNodeComment(c) && /*#__PURE__*/React.createElement("div", {
+    className: "branch-next"
+  }, sgfNodeComment(c).slice(0, 24)))))), children.length === 0 && !atRoot && /*#__PURE__*/React.createElement("div", {
+    className: "board-edit-hint"
+  }, "ここで手順が終わっています。")), /*#__PURE__*/React.createElement("div", {
+    className: "modal-form-col"
+  }, infoLines.length > 0 && /*#__PURE__*/React.createElement("div", {
+    className: "sgf-gameinfo"
+  }, infoLines.map((line, idx) => /*#__PURE__*/React.createElement("div", {
+    key: idx
+  }, line))), /*#__PURE__*/React.createElement("label", {
+    className: "form-label"
+  }, "登録する種別"), /*#__PURE__*/React.createElement("div", {
+    className: "turn-toggle",
+    style: {
+      justifyContent: "flex-start",
+      marginTop: 0
+    }
+  }, /*#__PURE__*/React.createElement("button", {
+    type: "button",
+    className: `turn-btn ${kind === "joseki" ? "active" : ""}`,
+    onClick: () => setKind("joseki")
+  }, "定石（部分手順）"), /*#__PURE__*/React.createElement("button", {
+    type: "button",
+    className: `turn-btn ${kind === "fuseki" ? "active" : ""}`,
+    onClick: () => setKind("fuseki")
+  }, "布石（全局的な構想）")), /*#__PURE__*/React.createElement("label", {
+    className: "form-label"
+  }, "この局面のコメント（SGF内）"), /*#__PURE__*/React.createElement("div", {
+    className: "sgf-comment"
+  }, comment ? comment : "（コメントはありません）"), /*#__PURE__*/React.createElement("div", {
+    className: "board-edit-hint",
+    style: {
+      textAlign: "left",
+      marginTop: 14
+    }
+  }, "左の盤面で「一手戻す／次へ」や変化のボタンを使って、定石として登録したい局面まで手順を選んでください。 分岐点では複数の変化から選べます。決まったら「この局面までを読み込む」を押すと、 内容を確認・編集できる登録フォームが開きます。"), /*#__PURE__*/React.createElement("div", {
+    className: "modal-actions"
+  }, /*#__PURE__*/React.createElement("button", {
+    className: "btn btn-ghost",
+    onClick: onCancel
+  }, "キャンセル"), /*#__PURE__*/React.createElement("button", {
+    className: "btn btn-primary",
+    onClick: handleImportHere
+  }, "この局面までを読み込む（", pathMoves.length, "手）"))))));
+}
+
+/* ============================== 分岐判定ヘルパー ============================== */
+
+// 2つの手順が先頭から何手一致しているかを返す
+function commonPrefixLen(a, b) {
+  let i = 0;
+  while (i < a.length && i < b.length && a[i].col === b[i].col && a[i].row === b[i].row && a[i].color === b[i].color) {
+    i++;
+  }
+  return i;
+}
+
+// ある局面（k手目）における、その定石の「次の一手」を短い文字列で表す
+function nextMoveLabel(entry, k) {
+  if (k >= entry.moves.length) return "ここで打ち切り";
+  const m = entry.moves[k];
+  return `${m.color === "b" ? "●黒" : "○白"} ${COLS[m.col - 1]}${m.row}`;
+}
+
+/* ============================== メインアプリ ============================== */
+
+function App() {
+  const [joseki, setJoseki] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [query, setQuery] = useState("");
+  const [activeTag, setActiveTag] = useState(null);
+  const [selectedId, setSelectedId] = useState(null);
+  const [playIndex, setPlayIndex] = useState(0);
+  const [formOpen, setFormOpen] = useState(false);
+  const [editingEntry, setEditingEntry] = useState(null);
+  const [fileHandle, setFileHandle] = useState(null);
+  const [fileName, setFileName] = useState("");
+  const [needsReconnect, setNeedsReconnect] = useState(false);
+  const [fileError, setFileError] = useState("");
+  const importInputRef = useRef(null);
+  const fsSupported = typeof window !== "undefined" && "showOpenFilePicker" in window;
+  const [sgfImport, setSgfImport] = useState(null); // { text, fileName } | null
+  const sgfInputRef = useRef(null);
+  const [kindFilter, setKindFilter] = useState("all"); // "all" | "joseki" | "fuseki"
+  useEffect(() => {
+    (async () => {
+      try {
+        let raw = localStorage.getItem(STORAGE_KEY);
+        if (raw === null) {
+          // 以前のバージョン（window.storage 経由）が使っていたプレフィックス付きキーからの
+          // 一回限りの移行。これがないと以前のデータが消えたように見えてしまう。
+          const legacyKey = "joseki-notebook:" + STORAGE_KEY;
+          const legacy = localStorage.getItem(legacyKey);
+          if (legacy !== null) {
+            raw = legacy;
+            localStorage.setItem(STORAGE_KEY, legacy);
+            localStorage.removeItem(legacyKey);
+          }
+        }
+        const arr = raw ? JSON.parse(raw) : [];
+        setJoseki(normalizeEntries(arr));
+      } catch (e) {
+        setJoseki([]);
+      } finally {
+        setLoading(false);
+      }
+      if (fsSupported) {
+        try {
+          const handle = await idbGetHandle();
+          if (handle) {
+            const perm = await handle.queryPermission({
+              mode: "readwrite"
+            });
+            setFileHandle(handle);
+            setFileName(handle.name);
+            if (perm === "granted") {
+              const arr = await readJosekiFile(handle);
+              setJoseki(arr);
+              try {
+                localStorage.setItem(STORAGE_KEY, JSON.stringify(arr));
+              } catch (e) {}
+            } else {
+              setNeedsReconnect(true);
+            }
+          }
+        } catch (e) {
+          /* 復元できなければブラウザ内保存のまま続行する */
+        }
+      }
+    })();
+  }, []);
+  const persist = async (next, opts = {}) => {
+    setJoseki(next);
+    try {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(next));
+    } catch (e) {
+      /* キャッシュ保存に失敗しても続行する */
+    }
+    if (fileHandle && !opts.skipFileWrite) {
+      try {
+        await writeJosekiFile(fileHandle, next);
+        setFileError("");
+      } catch (e) {
+        setFileError("データファイルへの保存に失敗しました（このブラウザ内には保存されています）");
+      }
+    }
+  };
+  const handleReconnect = async () => {
+    if (!fileHandle) return;
+    try {
+      const perm = await fileHandle.requestPermission({
+        mode: "readwrite"
+      });
+      if (perm === "granted") {
+        const arr = await readJosekiFile(fileHandle);
+        await persist(arr, {
+          skipFileWrite: true
+        });
+        setNeedsReconnect(false);
+        setFileError("");
+      }
+    } catch (e) {
+      setFileError("データファイルへの再接続に失敗しました");
+    }
+  };
+  const handleOpenFile = async () => {
+    try {
+      const [handle] = await window.showOpenFilePicker({
+        types: [{
+          description: "定石データ (JSON)",
+          accept: {
+            "application/json": [".json"]
+          }
+        }]
+      });
+      const arr = await readJosekiFile(handle);
+      if (joseki.length === 0 || window.confirm("現在のデータをこのファイルの内容で置き換えます。よろしいですか？")) {
+        setFileHandle(handle);
+        setFileName(handle.name);
+        setNeedsReconnect(false);
+        setFileError("");
+        await idbSetHandle(handle);
+        await persist(arr, {
+          skipFileWrite: true
+        });
+      }
+    } catch (e) {
+      if (e.name !== "AbortError") setFileError("ファイルを開けませんでした（JSON形式を確認してください）");
+    }
+  };
+  const handleCreateFile = async () => {
+    try {
+      const handle = await window.showSaveFilePicker({
+        suggestedName: "joseki-data.json",
+        types: [{
+          description: "定石データ (JSON)",
+          accept: {
+            "application/json": [".json"]
+          }
+        }]
+      });
+      await writeJosekiFile(handle, joseki);
+      setFileHandle(handle);
+      setFileName(handle.name);
+      setNeedsReconnect(false);
+      setFileError("");
+      await idbSetHandle(handle);
+    } catch (e) {
+      if (e.name !== "AbortError") setFileError("ファイルを作成できませんでした");
+    }
+  };
+  const handleUnlinkFile = async () => {
+    setFileHandle(null);
+    setFileName("");
+    setNeedsReconnect(false);
+    try {
+      await idbClearHandle();
+    } catch (e) {}
+  };
+  const handleExport = () => {
+    const blob = new Blob([JSON.stringify(joseki, null, 2)], {
+      type: "application/json"
+    });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = fileName || "joseki-data.json";
+    a.click();
+    URL.revokeObjectURL(url);
+  };
+  const handleImportClick = () => importInputRef.current && importInputRef.current.click();
+  const handleImportFile = async e => {
+    const file = e.target.files[0];
+    e.target.value = "";
+    if (!file) return;
+    try {
+      const text = await file.text();
+      const arr = JSON.parse(text);
+      if (!Array.isArray(arr)) throw new Error("形式が不正です");
+      if (joseki.length === 0 || window.confirm("現在のデータをこのファイルの内容で置き換えます。よろしいですか？")) {
+        await persist(normalizeEntries(arr));
+        setFileError("");
+      }
+    } catch (e) {
+      setFileError("ファイルの読み込みに失敗しました（JSON形式を確認してください）");
+    }
+  };
+  const handleSgfImportClick = () => sgfInputRef.current && sgfInputRef.current.click();
+  const handleSgfFile = async e => {
+    const file = e.target.files[0];
+    e.target.value = "";
+    if (!file) return;
+    try {
+      const text = await file.text();
+      setSgfImport({
+        text,
+        fileName: file.name
+      });
+    } catch (err) {
+      setFileError("SGFファイルを読み込めませんでした");
+    }
+  };
+  const handleSgfImported = draft => {
+    setEditingEntry(draft);
+    setFormOpen(true);
+    setSgfImport(null);
+  };
+  const selected = useMemo(() => joseki.find(j => j.id === selectedId) || null, [joseki, selectedId]);
+
+  // 選択中の定石を切り替える（手数はリセットして最終手まで表示）
+  const selectEntry = id => {
+    setSelectedId(id);
+    const entry = joseki.find(j => j.id === id);
+    setPlayIndex(entry ? entry.moves.length : 0);
+  };
+
+  // 分岐先へ切り替える（今見ている手数はそのまま維持する）
+  const switchToBranch = id => {
+    setSelectedId(id);
+  };
+
+  // 現在の再生位置（playIndex）でちょうど手順が分かれる／終わる、他の定石一覧
+  // （定石と布石は性質が異なるため、同じ種別同士でのみ分岐を検出する）
+  const branchSiblings = useMemo(() => {
+    if (!selected || playIndex === 0) return [];
+    return joseki.filter(o => o.id !== selected.id && o.kind === selected.kind && commonPrefixLen(selected.moves, o.moves) === playIndex);
+  }, [joseki, selected, playIndex]);
+
+  // 盤面上でマウスホイールを回して手順を送り／戻しできるようにする
+  const boardWrapRef = useRef(null);
+  useEffect(() => {
+    const el = boardWrapRef.current;
+    if (!el || !selected) return;
+    const maxLen = selected.moves.length;
+    const onWheel = e => {
+      e.preventDefault();
+      const dir = e.deltaY > 0 ? 1 : -1;
+      setPlayIndex(p => Math.max(0, Math.min(maxLen, p + dir)));
+    };
+    el.addEventListener("wheel", onWheel, {
+      passive: false
+    });
+    return () => el.removeEventListener("wheel", onWheel);
+  }, [selected]);
+
+  const kindScoped = useMemo(() => joseki.filter(j => kindFilter === "all" || j.kind === kindFilter), [joseki, kindFilter]);
+  const allTags = useMemo(() => {
+    const set = new Set();
+    kindScoped.forEach(j => j.tags.forEach(t => set.add(t)));
+    return Array.from(set);
+  }, [kindScoped]);
+  const filtered = useMemo(() => {
+    const q = query.trim();
+    return kindScoped.filter(j => !activeTag || j.tags.includes(activeTag)).filter(j => !q || j.name.includes(q) || j.tags.some(t => t.includes(q)) || (j.notes || "").includes(q)).sort((a, b) => b.createdAt - a.createdAt);
+  }, [kindScoped, query, activeTag]);
+  const newFormDefaultKind = kindFilter === "fuseki" ? "fuseki" : "joseki";
+  const openNewForm = () => {
+    setEditingEntry(null);
+    setFormOpen(true);
+  };
+  const openEditForm = entry => {
+    setEditingEntry(entry);
+    setFormOpen(true);
+  };
+  const handleSaveEntry = async entry => {
+    const exists = joseki.some(j => j.id === entry.id);
+    const next = exists ? joseki.map(j => j.id === entry.id ? entry : j) : [entry, ...joseki];
+    await persist(next);
+    setSelectedId(entry.id);
+    setPlayIndex(entry.moves.length);
+    setFormOpen(false);
+  };
+  const handleDelete = async id => {
+    if (!window.confirm("この定石を削除します。よろしいですか？")) return;
+    await persist(joseki.filter(j => j.id !== id));
+    if (selectedId === id) setSelectedId(null);
+  };
+  const handleResetAll = async () => {
+    if (!window.confirm("登録した定石をすべて削除します。元に戻せません。よろしいですか？")) return;
+    await persist([]);
+    setSelectedId(null);
+  };
+  const visibleStones = selected ? selected.moves.slice(0, playIndex) : [];
+  return /*#__PURE__*/React.createElement("div", {
+    className: "app"
+  }, /*#__PURE__*/React.createElement("style", null, `
+        @import url('https://fonts.googleapis.com/css2?family=Shippori+Mincho:wght@500;800&family=Zen+Kaku+Gothic+New:wght@400;500;700&family=JetBrains+Mono:wght@400;600&display=swap');
+
+        :root {
+          --paper: #f3eedd;
+          --paper-deep: #ece4cc;
+          --wood: #c89b4a;
+          --ink: #211d17;
+          --ink-soft: #6b6153;
+          --seal: #a23324;
+          --seal-soft: rgba(162,51,36,0.10);
+          --border: #ddcfa9;
+          --card-bg: #fbf8ef;
+        }
+        * { box-sizing: border-box; }
+        .app {
+          font-family: 'Zen Kaku Gothic New', sans-serif;
+          background: var(--paper);
+          background-image:
+            radial-gradient(circle at 15% 8%, rgba(255,255,255,0.5), transparent 40%),
+            radial-gradient(circle at 90% 85%, rgba(0,0,0,0.03), transparent 40%);
+          color: var(--ink);
+          min-height: 100%;
+          padding: 28px 32px 60px;
+        }
+        .header {
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          margin-bottom: 24px;
+          flex-wrap: wrap;
+          gap: 12px;
+        }
+        .brand { display: flex; align-items: center; gap: 12px; }
+        .seal-icon {
+          width: 40px; height: 40px;
+          border-radius: 6px;
+          background: var(--seal);
+          color: #fdf7e8;
+          display: flex; align-items: center; justify-content: center;
+          font-family: 'Shippori Mincho', serif;
+          font-weight: 800;
+          font-size: 20px;
+          box-shadow: 0 2px 4px rgba(0,0,0,0.25);
+          flex-shrink: 0;
+        }
+        .brand h1 {
+          font-family: 'Shippori Mincho', serif;
+          font-weight: 800;
+          font-size: 26px;
+          margin: 0;
+          letter-spacing: 0.04em;
+        }
+        .brand p {
+          margin: 2px 0 0;
+          font-size: 12.5px;
+          color: var(--ink-soft);
+          letter-spacing: 0.03em;
+        }
+        .btn {
+          font-family: 'Zen Kaku Gothic New', sans-serif;
+          border: 1px solid var(--border);
+          background: var(--card-bg);
+          color: var(--ink);
+          border-radius: 7px;
+          padding: 9px 16px;
+          font-size: 14px;
+          cursor: pointer;
+          transition: all 0.15s ease;
+        }
+        .btn:hover { border-color: var(--wood); background: #fff; }
+        .btn:disabled { opacity: 0.4; cursor: not-allowed; }
+        .btn-primary {
+          background: var(--seal);
+          border-color: var(--seal);
+          color: #fdf7e8;
+          font-weight: 600;
+        }
+        .btn-primary:hover { background: #8a2a1e; }
+        .btn-ghost { background: transparent; }
+        .btn-sm { padding: 5px 10px; font-size: 12.5px; }
+
+        .datafile-bar { display: flex; flex-direction: column; gap: 6px; margin-bottom: 18px; }
+        .datafile-status, .datafile-alert, .datafile-manual {
+          display: flex; align-items: center; gap: 10px; flex-wrap: wrap;
+          font-size: 12.5px; color: var(--ink-soft);
+        }
+        .datafile-alert {
+          background: var(--seal-soft); border: 1px solid rgba(162,51,36,0.35);
+          border-radius: 8px; padding: 8px 12px; color: var(--seal); font-weight: 600;
+        }
+        .datafile-status strong { color: var(--ink); }
+        .datafile-manual { justify-content: flex-end; }
+        .datafile-error { font-size: 12px; color: var(--seal); }
+
+        .layout {
+          display: grid;
+          grid-template-columns: 300px 1fr;
+          gap: 22px;
+          align-items: start;
+        }
+        @media (max-width: 760px) {
+          .layout { grid-template-columns: 1fr; }
+        }
+
+        .sidebar {
+          background: var(--card-bg);
+          border: 1px solid var(--border);
+          border-radius: 12px;
+          padding: 16px;
+        }
+        .search-input {
+          width: 100%;
+          padding: 9px 12px;
+          border-radius: 7px;
+          border: 1px solid var(--border);
+          font-size: 14px;
+          margin-bottom: 12px;
+          background: #fff;
+          font-family: inherit;
+        }
+        .tag-chips {
+          display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 14px;
+        }
+        .chip {
+          font-size: 12px;
+          padding: 4px 10px;
+          border-radius: 999px;
+          border: 1px solid var(--border);
+          background: #fff;
+          color: var(--ink-soft);
+          cursor: pointer;
+        }
+        .chip.active { background: var(--seal-soft); border-color: var(--seal); color: var(--seal); font-weight: 600; }
+        .chip-add { background: var(--paper-deep); }
+
+        .kind-tabs { display: flex; gap: 6px; margin-bottom: 12px; }
+        .kind-tab {
+          flex: 1;
+          font-family: inherit;
+          font-size: 13px;
+          padding: 7px 8px;
+          border-radius: 7px;
+          border: 1px solid var(--border);
+          background: #fff;
+          color: var(--ink-soft);
+          cursor: pointer;
+        }
+        .kind-tab.active { background: var(--seal); border-color: var(--seal); color: #fdf7e8; font-weight: 600; }
+        .kind-badge {
+          display: inline-flex;
+          align-items: center;
+          justify-content: center;
+          width: 16px; height: 16px;
+          border-radius: 4px;
+          font-size: 10px;
+          font-weight: 700;
+          color: #fdf7e8;
+          margin-right: 5px;
+          flex-shrink: 0;
+        }
+        .kind-badge-joseki { background: var(--seal); }
+        .kind-badge-fuseki { background: #3a6b52; }
+        .kind-chip { font-weight: 600; }
+        .kind-chip-joseki { color: var(--seal); border-color: var(--seal); background: var(--seal-soft); }
+        .kind-chip-fuseki { color: #2b5240; border-color: #3a6b52; background: rgba(58,107,82,0.10); }
+
+        .joseki-list { display: flex; flex-direction: column; gap: 8px; max-height: 64vh; overflow-y: auto; }
+        .joseki-card {
+          display: flex; align-items: center; gap: 10px;
+          padding: 8px; border-radius: 9px;
+          border: 1px solid transparent;
+          cursor: pointer;
+          background: #fff;
+        }
+        .joseki-card:hover { border-color: var(--border); }
+        .joseki-card.active { border-color: var(--seal); background: var(--seal-soft); }
+        .card-thumb { width: 64px; height: 64px; flex-shrink: 0; }
+        .card-info { min-width: 0; }
+        .card-name {
+          font-size: 13.5px; font-weight: 600;
+          white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+        }
+        .card-tags { font-size: 11px; color: var(--ink-soft); margin-top: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .empty-list { font-size: 13px; color: var(--ink-soft); padding: 20px 6px; text-align: center; }
+
+        .main {
+          background: var(--card-bg);
+          border: 1px solid var(--border);
+          border-radius: 12px;
+          padding: 26px;
+          min-height: 480px;
+        }
+        .empty-state {
+          display: flex; flex-direction: column; align-items: center; justify-content: center;
+          text-align: center; height: 440px; color: var(--ink-soft);
+        }
+        .empty-state h3 { font-family: 'Shippori Mincho', serif; font-size: 19px; color: var(--ink); margin-bottom: 6px; }
+
+        .detail-header { display: flex; justify-content: space-between; align-items: flex-start; gap: 12px; margin-bottom: 6px; flex-wrap: wrap; }
+        .detail-title { font-family: 'Shippori Mincho', serif; font-size: 22px; font-weight: 800; margin: 0; }
+        .detail-tags { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 8px; }
+        .detail-actions { display: flex; gap: 8px; }
+        .icon-btn {
+          border: none; background: transparent; font-size: 20px; cursor: pointer; color: var(--ink-soft);
+          line-height: 1; padding: 4px 8px; border-radius: 6px;
+        }
+        .icon-btn:hover { background: var(--paper-deep); color: var(--ink); }
+
+        .board-wrap { display: flex; justify-content: center; margin: 18px 0 8px; }
+        .playback-controls {
+          display: flex; align-items: center; justify-content: center; gap: 10px;
+          font-family: 'JetBrains Mono', monospace; font-size: 13px; color: var(--ink-soft);
+          margin-bottom: 18px;
+        }
+        .caption { text-align: center; font-size: 11.5px; color: var(--ink-soft); margin-top: -6px; margin-bottom: 14px; }
+
+        .branch-panel {
+          background: var(--seal-soft);
+          border: 1px solid rgba(162,51,36,0.35);
+          border-radius: 10px;
+          padding: 12px 14px;
+          margin-bottom: 18px;
+        }
+        .branch-title { font-size: 12.5px; font-weight: 600; color: var(--seal); margin-bottom: 8px; }
+        .branch-list { display: flex; flex-wrap: wrap; gap: 8px; }
+        .branch-card {
+          font-family: inherit;
+          text-align: left;
+          border: 1px solid var(--border);
+          background: #fff;
+          border-radius: 8px;
+          padding: 7px 11px;
+          cursor: pointer;
+          min-width: 140px;
+        }
+        .branch-card:hover { border-color: var(--seal); }
+        .branch-card.active { border-color: var(--seal); background: #fff; cursor: default; box-shadow: inset 0 0 0 1px var(--seal); }
+        .branch-name { font-size: 13px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 200px; }
+        .branch-next { font-size: 11.5px; color: var(--ink-soft); font-family: 'JetBrains Mono', monospace; margin-top: 2px; }
+
+        .notes-section { border-top: 1px dashed var(--border); padding-top: 14px; }
+        .notes-label { font-size: 12px; color: var(--ink-soft); margin-bottom: 6px; letter-spacing: 0.05em; }
+        .notes-text { font-size: 14px; line-height: 1.8; white-space: pre-wrap; }
+
+        .modal-overlay {
+          position: fixed; inset: 0; background: rgba(33,29,23,0.55);
+          display: flex; align-items: center; justify-content: center; z-index: 50; padding: 20px;
+        }
+        .modal {
+          background: var(--paper);
+          border-radius: 14px;
+          max-width: 1056px; width: 100%;
+          max-height: 97vh; overflow-y: auto;
+          box-shadow: 0 20px 50px rgba(0,0,0,0.35);
+        }
+        .modal-header { display: flex; align-items: center; gap: 11px; padding: 20px 24px; border-bottom: 1px solid var(--border); }
+        .modal-header h2 { font-family: 'Shippori Mincho', serif; font-size: 20px; margin: 0; flex: 1; }
+        .modal-body { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; padding: 24px; }
+        @media (max-width: 640px) { .modal-body { grid-template-columns: 1fr; } }
+        .modal-board-col { display: flex; flex-direction: column; align-items: center; }
+        .board-edit-hint { font-size: 11.5px; color: var(--ink-soft); text-align: center; margin-top: 8px; }
+        .turn-toggle { display: flex; align-items: center; gap: 6px; margin-top: 12px; flex-wrap: wrap; justify-content: center; font-size: 13px; }
+        .turn-btn { border: 1px solid var(--border); background: #fff; border-radius: 7px; padding: 6px 10px; font-size: 13px; cursor: pointer; }
+        .turn-btn.active { background: var(--seal); color: #fdf7e8; border-color: var(--seal); }
+
+        .form-label { display: block; font-size: 12.5px; color: var(--ink-soft); margin: 12px 0 5px; letter-spacing: 0.03em; }
+        .form-label:first-child { margin-top: 0; }
+        .req { color: var(--seal); margin-left: 2px; }
+        .form-input, .form-textarea {
+          width: 100%; border: 1px solid var(--border); border-radius: 7px; padding: 10px 12px;
+          font-family: inherit; font-size: 15px; background: #fff; resize: vertical;
+        }
+        .quick-tags { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px; }
+        .modal-actions { display: flex; justify-content: flex-end; gap: 10px; margin-top: 20px; }
+
+        .sgf-quickrow { margin-top: 8px; display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+        .sgf-jump { display: inline-flex; align-items: center; gap: 6px; }
+        .sgf-jump-input {
+          width: 64px; border: 1px solid var(--border); border-radius: 7px;
+          padding: 5px 8px; font-family: inherit; font-size: 12.5px; background: #fff;
+        }
+        .sgf-gameinfo {
+          font-size: 12.5px; color: var(--ink-soft); line-height: 1.7;
+          background: var(--paper-deep); border-radius: 8px; padding: 10px 12px; margin-bottom: 4px;
+        }
+        .sgf-comment {
+          font-size: 13px; line-height: 1.7; white-space: pre-wrap; word-break: break-word;
+          background: #fff; border: 1px solid var(--border); border-radius: 8px;
+          padding: 10px 12px; max-height: 160px; overflow-y: auto; color: var(--ink);
+        }
+        .sgf-error { font-size: 14px; color: var(--seal); padding: 12px 4px; }
+
+        .footer { text-align: center; margin-top: 30px; font-size: 12px; color: var(--ink-soft); }
+        .footer button { background: none; border: none; color: var(--ink-soft); text-decoration: underline; cursor: pointer; font-size: 12px; }
+      `), /*#__PURE__*/React.createElement("div", {
+    className: "header"
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "brand"
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "seal-icon"
+  }, "石"), /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("h1", null, "定石帖"), /*#__PURE__*/React.createElement("p", null, "自分だけの定石・布石ノート"))), /*#__PURE__*/React.createElement("div", {
+    style: {
+      display: "flex",
+      gap: 8
+    }
+  }, /*#__PURE__*/React.createElement("button", {
+    className: "btn btn-ghost",
+    onClick: handleSgfImportClick
+  }, "SGFから読み込む"), /*#__PURE__*/React.createElement("button", {
+    className: "btn btn-primary",
+    onClick: openNewForm
+  }, "＋ 新規登録"), /*#__PURE__*/React.createElement("input", {
+    ref: sgfInputRef,
+    type: "file",
+    accept: ".sgf,application/x-go-sgf",
+    style: {
+      display: "none"
+    },
+    onChange: handleSgfFile
+  }))), /*#__PURE__*/React.createElement("div", {
+    className: "datafile-bar"
+  }, needsReconnect && /*#__PURE__*/React.createElement("div", {
+    className: "datafile-alert"
+  }, "前回連携していたデータファイル「", fileName, "」への再接続が必要です。", /*#__PURE__*/React.createElement("button", {
+    className: "btn btn-ghost btn-sm",
+    onClick: handleReconnect
+  }, "許可して再接続")), !needsReconnect && fileHandle && /*#__PURE__*/React.createElement("div", {
+    className: "datafile-status"
+  }, "🔗 ", /*#__PURE__*/React.createElement("strong", null, fileName), " と連携中（登録・編集・削除は自動的にこのファイルへ保存されます）", /*#__PURE__*/React.createElement("button", {
+    className: "btn btn-ghost btn-sm",
+    onClick: handleUnlinkFile
+  }, "連携を解除")), !needsReconnect && !fileHandle && /*#__PURE__*/React.createElement("div", {
+    className: "datafile-status"
+  }, fsSupported ? /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement("span", null, "データは今のところこのブラウザ内にのみ保存されています。"), /*#__PURE__*/React.createElement("button", {
+    className: "btn btn-ghost btn-sm",
+    onClick: handleOpenFile
+  }, "データファイルを開く"), /*#__PURE__*/React.createElement("button", {
+    className: "btn btn-ghost btn-sm",
+    onClick: handleCreateFile
+  }, "新規データファイルとして保存")) : /*#__PURE__*/React.createElement("span", null, "データは現在このブラウザ内に保存されています。JSONファイルへの書き出し・読み込みで管理できます。")), /*#__PURE__*/React.createElement("div", {
+    className: "datafile-manual"
+  }, /*#__PURE__*/React.createElement("button", {
+    className: "btn btn-ghost btn-sm",
+    onClick: handleExport
+  }, "JSONを書き出す"), /*#__PURE__*/React.createElement("button", {
+    className: "btn btn-ghost btn-sm",
+    onClick: handleImportClick
+  }, "JSONを読み込む"), /*#__PURE__*/React.createElement("input", {
+    ref: importInputRef,
+    type: "file",
+    accept: "application/json,.json",
+    style: {
+      display: "none"
+    },
+    onChange: handleImportFile
+  })), fileError && /*#__PURE__*/React.createElement("div", {
+    className: "datafile-error"
+  }, fileError)), /*#__PURE__*/React.createElement("div", {
+    className: "layout"
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "sidebar"
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "kind-tabs"
+  }, [["all", "すべて"], ["joseki", "定石"], ["fuseki", "布石"]].map(([k, label]) => /*#__PURE__*/React.createElement("button", {
+    key: k,
+    className: `kind-tab ${kindFilter === k ? "active" : ""}`,
+    onClick: () => {
+      setKindFilter(k);
+      setActiveTag(null);
+    }
+  }, label))), /*#__PURE__*/React.createElement("input", {
+    className: "search-input",
+    placeholder: "名前・タグ・メモで検索",
+    value: query,
+    onChange: e => setQuery(e.target.value)
+  }), allTags.length > 0 && /*#__PURE__*/React.createElement("div", {
+    className: "tag-chips"
+  }, allTags.map(t => /*#__PURE__*/React.createElement("button", {
+    key: t,
+    className: `chip ${activeTag === t ? "active" : ""}`,
+    onClick: () => setActiveTag(activeTag === t ? null : t)
+  }, t))), /*#__PURE__*/React.createElement("div", {
+    className: "joseki-list"
+  }, loading && /*#__PURE__*/React.createElement("div", {
+    className: "empty-list"
+  }, "読み込み中…"), !loading && filtered.length === 0 && /*#__PURE__*/React.createElement("div", {
+    className: "empty-list"
+  }, kindScoped.length === 0 ? kindFilter === "all" ? "まだ何も登録されていません" : `まだ${KIND_LABELS[kindFilter]}が登録されていません` : "該当するものがありません"), !loading && filtered.map(j => /*#__PURE__*/React.createElement("div", {
+    key: j.id,
+    className: `joseki-card ${selectedId === j.id ? "active" : ""}`,
+    onClick: () => selectEntry(j.id)
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "card-thumb"
+  }, /*#__PURE__*/React.createElement(GoBoard, {
+    stones: j.moves,
+    size: 64,
+    idPrefix: "t" + j.id
+  })), /*#__PURE__*/React.createElement("div", {
+    className: "card-info"
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "card-name"
+  }, /*#__PURE__*/React.createElement("span", {
+    className: `kind-badge kind-badge-${j.kind}`
+  }, KIND_LABELS[j.kind][0]), j.name), /*#__PURE__*/React.createElement("div", {
+    className: "card-tags"
+  }, j.tags.length ? j.tags.join(" ・ ") : `${j.moves.length}手`)))))), /*#__PURE__*/React.createElement("div", {
+    className: "main"
+  }, !selected && /*#__PURE__*/React.createElement("div", {
+    className: "empty-state"
+  }, /*#__PURE__*/React.createElement("div", {
+    style: {
+      marginBottom: 16
+    }
+  }, /*#__PURE__*/React.createElement(GoBoard, {
+    stones: [],
+    size: 160,
+    idPrefix: "empty"
+  })), /*#__PURE__*/React.createElement("h3", null, "定石・布石を選択してください"), /*#__PURE__*/React.createElement("p", null, "左の一覧から選ぶか、「＋ 新規登録」から", /*#__PURE__*/React.createElement("br", null), "最初の1件を追加しましょう。")), selected && /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement("div", {
+    className: "detail-header"
+  }, /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("h2", {
+    className: "detail-title"
+  }, selected.name), /*#__PURE__*/React.createElement("div", {
+    className: "detail-tags"
+  }, /*#__PURE__*/React.createElement("span", {
+    className: `chip kind-chip kind-chip-${selected.kind}`
+  }, KIND_LABELS[selected.kind]), selected.tags.map(t => /*#__PURE__*/React.createElement("span", {
+    key: t,
+    className: "chip"
+  }, t)))), /*#__PURE__*/React.createElement("div", {
+    className: "detail-actions"
+  }, /*#__PURE__*/React.createElement("button", {
+    className: "icon-btn",
+    title: "編集",
+    onClick: () => openEditForm(selected)
+  }, "✎"), /*#__PURE__*/React.createElement("button", {
+    className: "icon-btn",
+    title: "削除",
+    onClick: () => handleDelete(selected.id)
+  }, "🗑"))), /*#__PURE__*/React.createElement("div", {
+    className: "board-wrap",
+    ref: boardWrapRef
+  }, /*#__PURE__*/React.createElement(GoBoard, {
+    stones: visibleStones,
+    size: 540,
+    showLabels: true,
+    idPrefix: "main"
+  })), /*#__PURE__*/React.createElement("div", {
+    className: "playback-controls"
+  }, /*#__PURE__*/React.createElement("button", {
+    className: "btn btn-ghost",
+    onClick: () => setPlayIndex(0),
+    disabled: playIndex === 0
+  }, "｜◀"), /*#__PURE__*/React.createElement("button", {
+    className: "btn btn-ghost",
+    onClick: () => setPlayIndex(Math.max(0, playIndex - 1)),
+    disabled: playIndex === 0
+  }, "◀"), /*#__PURE__*/React.createElement("span", null, playIndex, " / ", selected.moves.length, " 手"), /*#__PURE__*/React.createElement("button", {
+    className: "btn btn-ghost",
+    onClick: () => setPlayIndex(Math.min(selected.moves.length, playIndex + 1)),
+    disabled: playIndex === selected.moves.length
+  }, "▶"), /*#__PURE__*/React.createElement("button", {
+    className: "btn btn-ghost",
+    onClick: () => setPlayIndex(selected.moves.length),
+    disabled: playIndex === selected.moves.length
+  }, "▶｜")), /*#__PURE__*/React.createElement("div", {
+    className: "caption"
+  }, "盤面上でマウスホイールを回すと手順を送り／戻しできます"), branchSiblings.length > 0 && /*#__PURE__*/React.createElement("div", {
+    className: "branch-panel"
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "branch-title"
+  }, "🔀 ", playIndex, "手目で分岐する", KIND_LABELS[selected.kind], "が", branchSiblings.length, "件あります"), /*#__PURE__*/React.createElement("div", {
+    className: "branch-list"
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "branch-card active"
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "branch-name"
+  }, selected.name), /*#__PURE__*/React.createElement("div", {
+    className: "branch-next"
+  }, nextMoveLabel(selected, playIndex))), branchSiblings.map(o => /*#__PURE__*/React.createElement("button", {
+    key: o.id,
+    className: "branch-card",
+    onClick: () => switchToBranch(o.id)
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "branch-name"
+  }, o.name), /*#__PURE__*/React.createElement("div", {
+    className: "branch-next"
+  }, nextMoveLabel(o, playIndex)))))), /*#__PURE__*/React.createElement("div", {
+    className: "notes-section"
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "notes-label"
+  }, "メモ"), /*#__PURE__*/React.createElement("div", {
+    className: "notes-text"
+  }, selected.notes ? selected.notes : "（メモはまだありません）"))))), /*#__PURE__*/React.createElement("div", {
+    className: "footer"
+  }, "登録数：", joseki.length, "件\u3000", joseki.length > 0 && /*#__PURE__*/React.createElement("button", {
+    onClick: handleResetAll
+  }, "全データを削除")), formOpen && /*#__PURE__*/React.createElement(JosekiForm, {
+    initial: editingEntry,
+    onSave: handleSaveEntry,
+    onCancel: () => setFormOpen(false),
+    defaultKind: newFormDefaultKind
+  }), sgfImport && /*#__PURE__*/React.createElement(SgfImportModal, {
+    sgfText: sgfImport.text,
+    fileName: sgfImport.fileName,
+    onCancel: () => setSgfImport(null),
+    onImport: handleSgfImported
+  }));
+}
+
+const root = ReactDOM.createRoot(document.getElementById("root"));
+root.render(React.createElement(App));
+</script>
+</body>
+</html>
